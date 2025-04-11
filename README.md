@@ -194,3 +194,62 @@ INFO:app:04/11/2025, 18:45:20, New article "Kubernetes 101" created!
 - **Monitoring**: Logs provide real-time information for system health and behavior.
 - **Incident Response**: During outages, logs are often the first source for root cause analysis.
 
+
+## Docker for Application Packaging
+
+The application was packaged using Docker for easier deployment and environment consistency. This allows the TechTrends project to be run in any environment that supports Docker.
+
+### Objective
+To write a Dockerfile, build an image, and run the Flask application inside a Docker container.
+
+### Dockerfile Overview
+A `Dockerfile` was created in the project root directory with the following steps:
+- Uses `python:3.8-slim` as the base image
+- Sets `/app` as the working directory
+- Copies the application source files
+- Installs dependencies from `requirements.txt`
+- Initializes the database with `init_db.py`
+- Exposes port `3111`
+- Runs the application with `python app.py`
+
+### Sample Dockerfile
+```dockerfile
+FROM python:3.8-slim
+WORKDIR /app
+COPY . .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN python init_db.py
+EXPOSE 3111
+CMD ["python", "app.py"]
+```
+
+### Building and Running the Image
+The Docker image was built and tested locally:
+
+```bash
+# Build the image
+docker build -t techtrends .
+
+# Run the container in detached mode and map to host port 7111
+docker run -d -p 7111:3111 techtrends
+```
+
+### Testing the Container
+After running the container, the application was accessible at:
+```
+http://127.0.0.1:7111
+```
+
+All routes (`/`, `/create`, `/metrics`, `/about`) were tested successfully in the browser. A screenshot of the live application output was saved under `screenshots/docker-run-local.png`.
+
+### Retrieving Logs
+To view logs from the running container:
+
+```bash
+docker ps
+docker logs <container_id>
+```
+
+Sample logs included standard Flask access logs and custom application logs, confirming that the containerized app works correctly and logs behave as expected.
+
+
