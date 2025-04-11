@@ -1,0 +1,14 @@
+name: Minimal Test
+
+on:
+  push:
+    branches:
+      - project/TechTrends
+
+jobs:
+  test-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Hello
+        run: echo "GitHub Actions is working!"
+
