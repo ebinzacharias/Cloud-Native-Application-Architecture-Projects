@@ -74,6 +74,12 @@ def create():
 def healthz():
     return jsonify(result="OK - healthy"), 200
 
+@app.route('/metrics')
+def metrics():
+    connection = get_db_connection()
+    post_count = connection.execute('SELECT COUNT(*) FROM posts').fetchone()[0]
+    connection.close()
+    return jsonify(db_connection_count=db_connection_count, post_count=post_count), 200
 
 
 # start the application on port 3111
