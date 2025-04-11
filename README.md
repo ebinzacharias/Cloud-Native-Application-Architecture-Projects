@@ -37,7 +37,7 @@ You can fork or download the project from:
 
 ## Best Practices for Application Deployment
 
-### Healthcheck Endpoint
+### 1. Healthcheck Endpoint
 
 As part of applying deployment best practices, a healthcheck endpoint `/healthz` was implemented. This allows systems like Kubernetes or load balancers to monitor the application’s availability.
 
@@ -77,4 +77,120 @@ Key use cases include:
 
 Even a simple check, like returning a 200 OK from a known endpoint, is enough to indicate that the application is alive. This check can later be extended to verify database connectivity, external service availability, or application-specific conditions.
 
+### 2. Metrics Endpoint
+
+As part of implementing observability best practices, a metrics endpoint `/metrics` was added. This endpoint provides basic runtime statistics that can be used for monitoring the application's activity and health over time.
+
+### Objective
+To implement a `/metrics` HTTP endpoint that returns real-time application metrics in JSON format. These metrics help in tracking how the application is being used and how often it interacts with the database.
+
+### Endpoint Details
+- **Route**: `/metrics`
+- **Method**: `GET`
+- **Response Code**: `200 OK`
+- **Response Body** (example):
+  ```json
+  {
+    "db_connection_count": 1,
+    "post_count": 6
+  }
+  ```
+
+### Implementation
+The `/metrics` endpoint was added to the Flask application in the `app.py` file as follows:
+
+```python
+@app.route('/metrics')
+def metrics():
+    connection = get_db_connection()
+    post_count = connection.execute('SELECT COUNT(*) FROM posts').fetchone()[0]
+    connection.close()
+    return jsonify(db_connection_count=db_connection_count, post_count=post_count), 200
+```
+
+Additionally, the `get_db_connection()` function was updated to increment a global `db_connection_count` variable every time a database connection is established:
+
+```python
+db_connection_count = 0
+
+def get_db_connection():
+    global db_connection_count
+    connection = sqlite3.connect('database.db')
+    connection.row_factory = sqlite3.Row
+    db_connection_count += 1
+    return connection
+```
+
+### Purpose and Importance of Metrics
+
+Exposing application metrics is essential for understanding how an application is performing in real time. The metrics collected help identify performance bottlenecks, unusual activity, or trends in resource usage.
+ng**: Helps anticipate scaling needs based on post volume and usage patterns.
+- **Support for Observability**: Forms the foundation for deeper telemetry collection and analysis when combined with logs and traces.
+
+The `/metrics` endpoint provides foundational insights into the application’s behavior without exposing sensitive or detailed information.
+ies occur.
+- **Capacity Planning**: Helps anticipate scaling needs based on post volume and usage patterns.
+- **Support for Observability**: Forms the foundation for deeper telemetry collection and analysis when combined with logs and traces.
+
+The `/metrics` endpoint provides foundational insights into the application’s behavior without exposing sensitive or detailed information.
+
+
+
+### 3. Logging
+
+To ensure traceability and enable debugging and observability, logging was added across key operations in the application. Logs are printed to STDOUT and include timestamps, log levels, and descriptive messages.
+
+### Objective
+To log important application events such as article retrieval, post creation, page access, and error cases. These logs help monitor usage patterns and troubleshoot issues efficiently.
+
+### Implementation
+Logging was configured using Python's built-in `logging` module. The configuration ensures all log messages are displayed on STDOUT with proper timestamps and at DEBUG level or higher:
+
+```python
+import logging
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(levelname)s:app:%(asctime)s, %(message)s',
+                    datefmt='%m/%d/%Y, %H:%M:%S')
+```
+
+### Events Logged
+- **Article retrieved**:
+  ```python
+  logging.info(f'Article "{post["title"]}" retrieved!')
+  ```
+
+- **404 page shown**:
+  ```python
+  logging.info(f"Article ID {post_id} not found. Returning 404 page.")
+  ```
+
+- **About Us page accessed**:
+  ```python
+  logging.info("About Us page retrieved")
+  ```
+
+- **New article created**:
+  ```python
+  logging.info(f'New article "{title}" created!')
+  ```
+
+- **Missing title in form submission**:
+  ```python
+  logging.info('No Title is given')
+  ```
+
+### Example Log Output
+```
+INFO:app:04/11/2025, 18:45:10, Article "Cloud Native Architecture" retrieved!
+INFO:app:04/11/2025, 18:45:12, About Us page retrieved
+INFO:app:04/11/2025, 18:45:20, New article "Kubernetes 101" created!
+```
+
+### Purpose and Importance of Logging
+
+- **Debugging**: Logs help developers understand the flow and identify issues.
+- **Auditing**: Track who accessed what and when, especially useful in production environments.
+- **Monitoring**: Logs provide real-time information for system health and behavior.
+- **Incident Response**: During outages, logs are often the first source for root cause analysis.
 
