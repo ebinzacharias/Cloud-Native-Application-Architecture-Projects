@@ -1,2 +1,6 @@
 # Build the Docker image
 docker build -t techtrends .
+
+# Run the Docker container locally
+docker run -d -p 7111:3111 techtrends
+
