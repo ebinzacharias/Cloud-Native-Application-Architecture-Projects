@@ -1,5 +1,7 @@
 # Project TechTrends
 
+This is a Flask application that lists the latest articles within the cloud-native ecosystem.
+
 ## Getting Started
 
 ### Prerequisites
