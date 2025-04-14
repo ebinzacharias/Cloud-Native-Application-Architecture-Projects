@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: file:///home/vagrant/helm-chart
-    targetRevision: HEAD
-    path: .
+    repoURL: https://github.com/ebinzacharias/Cloud-Native-Application-Architecture-Projects.git
+    targetRevision: main
+    path: techtrends/helm/techtrends
     helm:
       valueFiles:
         - values-staging.yaml
