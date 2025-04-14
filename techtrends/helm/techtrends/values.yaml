@@ -1,0 +1,31 @@
+namespace: sandbox
+
+image:
+  repository: ezachs/techtrends
+  tag: latest
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+containerPort: 3111
+
+service:
+  type: ClusterIP
+  port: 4111
+  targetPort: 3111
+  protocol: TCP
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 250m
+    memory: 64Mi
+
+livenessProbe:
+  path: /healthz
+
+readinessProbe:
+  path: /healthz
+
