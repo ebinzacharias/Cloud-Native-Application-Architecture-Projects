@@ -554,3 +554,46 @@ kubectl get all -n prod
 You should see deployments, services, and multiple running pods in each namespace based on the values provided.
 
 
+## Continuous Delivery with ArgoCD
+
+ArgoCD was used to implement continuous delivery of the TechTrends application to different environments using Helm.
+
+### Objective
+To automate and manage deployments using ArgoCD with Helm charts for the staging and production environments.
+
+### ArgoCD Installation
+- Installed in the Kubernetes cluster using the official install guide.
+- Exposed ArgoCD server using a NodePort service.
+- Verified pods using:
+  ```bash
+  kubectl get pods -n argocd
+  ```
+- Created the NodePort service:
+  ```bash
+  kubectl expose deployment argocd-server \
+    --type=NodePort \
+    --name=argocd-server-nodeport \
+    --port=80 \
+    --target-port=8080 \
+    --namespace=argocd
+  ```
+- Verified external access:
+  ```bash
+  curl http://192.168.50.4:<NodePort>
+  ```
+  (e.g., NodePort: `31770`)
+
+### ArgoCD Default Credentials
+- **Username**: `admin`
+- **Password**: Retrieved using:
+  ```bash
+  kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d
+  ```
+
+### ArgoCD UI Access
+- Accessible from host at: `http://192.168.50.4:<NodePort>` (e.g., `http://192.168.50.4:31770`)
+- Screenshot saved as: `screenshots/argocd-ui.png`
+
+
+
+
