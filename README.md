@@ -444,3 +444,113 @@ This approach ensures your application is managed declaratively and is ready for
 
 
 
+## Helm Chart for TechTrends
+
+To make Kubernetes manifests reusable across environments, we converted them into a Helm Chart.
+
+### Helm Chart Setup
+Directory created:
+```
+helm/techtrends/
+```
+
+### Files Modified or Created
+- `Chart.yaml`
+- `values.yaml`
+- `templates/namespace.yaml`
+- `templates/deployment.yaml`
+- `templates/service.yaml`
+
+### Chart.yaml
+```yaml
+apiVersion: v2
+name: techtrends
+version: 1.0.0
+keywords:
+  - techtrends
+maintainers:
+  - name: ebin
+```
+
+### values.yaml (default)
+```yaml
+namespace: sandbox
+image:
+  repository: ezachs/techtrends
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  port: 4111
+  targetPort: 3111
+  protocol: TCP
+  type: ClusterIP
+replicaCount: 1
+resources:
+  requests:
+    memory: "64Mi"
+    cpu: "250m"
+  limits:
+    memory: "128Mi"
+    cpu: "500m"
+containerPort: 3111
+livenessProbe:
+  path: /healthz
+readinessProbe:
+  path: /healthz
+```
+
+### Environment-specific Values
+- `values-staging.yaml`
+```yaml
+namespace: staging
+service:
+  port: 5111
+replicaCount: 3
+resources:
+  requests:
+    memory: "90Mi"
+    cpu: "300m"
+  limits:
+    memory: "128Mi"
+    cpu: "500m"
+```
+
+- `values-prod.yaml`
+```yaml
+namespace: prod
+service:
+  port: 7111
+image:
+  pullPolicy: Always
+replicaCount: 5
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "350m"
+  limits:
+    memory: "256Mi"
+    cpu: "500m"
+```
+
+### Commands Used
+Inside the VM:
+```bash
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+helm install techtrends-staging . -f values-staging.yaml --create-namespace
+helm install techtrends-prod . -f values-prod.yaml --create-namespace
+```
+
+### Fix Applied
+- Deleted `templates/NOTES.txt` to fix:
+  ```
+  Error: template: techtrends/templates/NOTES.txt:2:14: executing "...": nil pointer evaluating interface {}.enabled
+  ```
+
+### Verification
+```bash
+kubectl get all -n staging
+kubectl get all -n prod
+```
+You should see deployments, services, and multiple running pods in each namespace based on the values provided.
+
+
