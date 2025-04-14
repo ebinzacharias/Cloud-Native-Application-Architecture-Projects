@@ -595,5 +595,145 @@ To automate and manage deployments using ArgoCD with Helm charts for the staging
 - Screenshot saved as: `screenshots/argocd-ui.png`
 
 
+## Continuous Delivery with ArgoCD
+
+ArgoCD was used to deploy TechTrends to staging and production environments using Helm charts and automated synchronization.
+
+### Objective
+To set up ArgoCD on the Kubernetes (k3s) cluster and configure it to deploy TechTrends automatically via Helm with environment-specific values.
+
+---
+
+### ArgoCD Installation and Exposure
+
+1. **Install ArgoCD in the k3s cluster:**
+```bash
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+
+2. **Expose the ArgoCD server using NodePort:**
+```bash
+kubectl expose deployment argocd-server \
+  --type=NodePort \
+  --name=argocd-server-nodeport \
+  --port=80 \
+  --target-port=8080 \
+  --namespace=argocd
+```
+
+3. **Check the NodePort assigned:**
+```bash
+kubectl get svc argocd-server-nodeport -n argocd
+```
+
+Example output:
+```
+NAME                     TYPE       CLUSTER-IP       PORT(S)          NODE-PORT
+argocd-server-nodeport   NodePort   10.43.185.253    80:31770/TCP     31770
+```
+
+4. **Access ArgoCD UI from the browser using VM IP:**
+```
+http://192.168.50.4:<nodePort>  # e.g., http://192.168.50.4:31770
+```
+
+---
+
+### Access Credentials
+
+1. **Get the default admin password:**
+```bash
+kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d
+```
+
+2. **Login as:**
+- **Username:** `admin`
+- **Password:** (output from above command)
+
+---
+
+### ArgoCD Applications (Manifests)
+
+Two manifests were created in the `argo/` directory:
+- `helm-techtrends-staging.yaml`
+- `helm-techtrends-prod.yaml`
+
+#### Sample structure of `helm-techtrends-prod.yaml`:
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: techtrends-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: file:///home/vagrant/helm-chart
+    targetRevision: HEAD
+    path: .
+    helm:
+      valueFiles:
+        - values-prod.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+```
+
+---
+
+### File Upload to VM
+
+1. Files were created in the host machine:
+   - `argo/helm-techtrends-prod.yaml`
+   - `argo/helm-techtrends-staging.yaml`
+
+2. **Copied into the VM under `/home/vagrant/argo` using:**
+```bash
+vagrant upload ./techtrends/argo/helm-techtrends-prod.yaml /home/vagrant/argo
+vagrant upload ./techtrends/argo/helm-techtrends-staging.yaml /home/vagrant/argo
+```
+
+3. **Verified inside VM:**
+```bash
+vagrant@localhost:~> ls /home/vagrant/argo
+```
+
+---
+
+### Applying the Applications
+
+```bash
+kubectl apply -f /home/vagrant/argo/helm-techtrends-staging.yaml
+kubectl apply -f /home/vagrant/argo/helm-techtrends-prod.yaml
+```
+
+---
+
+### Troubleshooting
+
+- **Problem:** ArgoCD UI not accessible
+- **Reason:** NodePort not mapped correctly or ArgoCD pod restart
+- **Solution:**
+  - Deleted old service: `kubectl delete svc argocd-server-nodeport -n argocd`
+  - Re-exposed the deployment using NodePort (as shown above)
+
+- **Problem:** UI shows `failed to list refs: repository not found`
+- **Reason:** Incorrect `repoURL` or not using an actual Git repo.
+- **Solution:** Used local path with `repoURL: file:///home/vagrant/helm-chart` and verified file structure.
+
+---
+
+### Verification
+
+- ArgoCD UI accessible at: `http://192.168.50.4:<nodePort>`
+- Staging and Production apps synced and deployed
+- Screenshots saved after successful sync:
+  - `screenshots/argocd-techtrends-staging.png`
+  - `screenshots/argocd-techtrends-prod.png`
 
 
