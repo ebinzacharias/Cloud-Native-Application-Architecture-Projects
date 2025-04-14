@@ -1,0 +1,1 @@
+{"rsync":{"/vagrant":{"type":"rsync","guestpath":"/vagrant","hostpath":"/home/ebin/PROF_DEV/Cloud Native Application Architecture/Cloud-Native-Application-Architecture-Projects","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}
