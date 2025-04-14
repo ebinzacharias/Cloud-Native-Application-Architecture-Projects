@@ -1,7 +1,5 @@
 # Project TechTrends
 
-This is a Flask application that lists the latest articles within the cloud-native ecosystem.
-
 ## Getting Started
 
 ### Prerequisites
@@ -253,5 +251,196 @@ docker logs <container_id>
 ```
 
 Sample logs included standard Flask access logs and custom application logs, confirming that the containerized app works correctly and logs behave as expected.
+
+
+## Continuous Integration with GitHub Actions
+
+As part of automating the application packaging process, we implemented Continuous Integration (CI) using GitHub Actions. This ensures that every new push to the `main` branch results in a new Docker image being built and pushed to DockerHub.
+
+### Objective
+To automate the Docker image creation and publication process using GitHub Actions. This ensures faster iteration, consistency, and deployment readiness with every code change.
+
+### GitHub Workflow File
+A GitHub Actions workflow was created at:
+```
+.github/workflows/techtrends-dockerhub.yml
+```
+
+### Workflow Overview
+- **Name**: TechTrends - Package with Docker
+- **Trigger**: Every push to the `main` branch
+- **Runner**: `ubuntu-latest`
+- **Docker Tag**: `techtrends:latest`
+- **Docker Registry**: DockerHub
+
+### Workflow File Content
+```yaml
+name: TechTrends - Package with Docker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./techtrends
+          file: ./techtrends/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/techtrends:latest
+```
+
+### Secrets Configuration
+To avoid exposing sensitive information, the DockerHub credentials are securely stored using GitHub Secrets:
+- `DOCKERHUB_USERNAME`: Your DockerHub username
+- `DOCKERHUB_TOKEN`: DockerHub access token (generated in your DockerHub account)
+
+Secrets were added in:
+```
+GitHub Repo → Settings → Secrets and variables → Actions
+```
+
+### Triggering the Workflow
+After committing and pushing changes to the `main` branch, GitHub Actions is triggered. It builds and pushes the Docker image to DockerHub automatically.
+
+### Verifying the Result
+- **GitHub Actions**: A successful run of the workflow can be viewed under the **Actions** tab
+- **DockerHub**: The new image with tag `latest` appears under the `techtrends` repository in the linked DockerHub account
+
+### Screenshots
+- `screenshots/ci-github-actions.png`: GitHub Actions successful workflow run
+- `screenshots/ci-dockerhub.png`: DockerHub image listing with `techtrends:latest`
+
+This integration ensures a reliable and repeatable packaging process for the TechTrends application every time new code is committed.
+
+
+## Kubernetes Declarative Manifests
+
+This section describes the process of deploying the TechTrends application on a Kubernetes cluster using declarative YAML manifests.
+
+### Objective
+To deploy the TechTrends application into a namespace `sandbox` using Kubernetes manifests for:
+- Namespace
+- Deployment
+- Service
+
+### Prerequisites
+- Kubernetes cluster running with k3s (set up via Vagrant)
+- kubectl configured and working inside the VM
+- Docker image `ezachs/techtrends:latest` available on DockerHub
+
+### YAML Manifests
+
+#### namespace.yaml
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sandbox
+```
+
+#### deploy.yaml
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: techtrends
+  namespace: sandbox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: techtrends
+  template:
+    metadata:
+      labels:
+        app: techtrends
+    spec:
+      containers:
+      - name: techtrends
+        image: ezachs/techtrends:latest
+        ports:
+        - containerPort: 3111
+        resources:
+          requests:
+            cpu: 250m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 3111
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 3111
+```
+
+#### service.yaml
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: techtrends
+  namespace: sandbox
+spec:
+  selector:
+    app: techtrends
+  ports:
+    - protocol: TCP
+      port: 4111
+      targetPort: 3111
+  type: ClusterIP
+```
+
+### Apply Manifests
+Run the following commands inside the VM:
+```bash
+kubectl apply -f namespace.yaml
+kubectl apply -f deploy.yaml
+kubectl apply -f service.yaml
+```
+
+### Verification
+```bash
+kubectl get all -n sandbox
+```
+Ensure that:
+- A pod is running
+- A deployment and replicaset exist
+- A ClusterIP service is active
+
+### Troubleshooting
+- **ImagePullBackOff**: Ensure the Docker image exists and is public.
+  Use `docker pull ezachs/techtrends:latest` to verify availability.
+- **Namespace not found**: Apply `namespace.yaml` before other manifests.
+
+### Screenshots to Include
+- `screenshots/k8s-nodes.png`: Output of `kubectl get nodes`
+- `screenshots/kubernetes-declarative-manifests.png`: Output of `kubectl get all -n sandbox`
+
+This approach ensures your application is managed declaratively and is ready for production-like Kubernetes environments.
+
+
 
 
