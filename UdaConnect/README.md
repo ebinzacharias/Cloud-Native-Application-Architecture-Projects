@@ -1,4 +1,57 @@
 # UdaConnect
+
+## Refactoring into Microservices
+
+**cd** into the repository folder:
+
+```bash
+   cd UdaConnect 
+```
+
+```bash
+   vagrant up
+```
+
+```bash
+   vagrant ssh
+```
+
+## Deploy API and APplication Services
+
+1. Deploy the Location gRPC service:
+
+```bash
+   kubectl apply -f deployment/location-service-grpc.yaml
+
+```
+
+###Location Kafka Consumer Service
+2. Deploy the Location Kafka Consumer Service:
+
+```bash
+kubectl apply -f deployment/location-consumer.yaml
+```
+###Person REST API Service
+3. Deploy the Person REST API service:
+
+```bash
+kubectl apply -f deployment/person-service-deployment.yaml
+```
+
+###Person REST API Service
+3. Deploy the Connection service:
+
+```bash
+kubectl apply -f deployment/connection-service-deployment.yaml
+```
+###Kafka and Zookeeper
+
+```bash
+kubectl apply -f deployment/kafka.yaml
+kubectl apply -f deployment/zookeeper.yaml
+```
+
+
 ## Overview
 ### Background
 Conferences and conventions are hotspots for making connections. Professionals in attendance often share the same interests and can make valuable business and personal connections with one another. At the same time, these events draw a large crowd and it's often hard to make these connections in the midst of all of these events' excitement and energy. To help attendees make connections, we are building the infrastructure for a service that can inform attendees if they have attended the same booths and presentations at an event.
