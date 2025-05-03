@@ -1,0 +1,21 @@
+1. Kafka for Event-driven Communication between Services (Location Service & Connection Service)
+
+Kafka is used for event-driven communication between services like the Location Service and the Connection Service. This message passing strategy ensures that the services are loosely coupled, meaning the Location Service can publish events (like location data) asynchronously without waiting for the Connection Service to respond in real-time. Kafka guarantees high availability, durability, and scalability for handling large volumes of messages in a fault-tolerant way, making it an excellent choice for decoupled, event-driven microservice architectures.
+
+2. gRPC for Internal Communication between Location Service and Person Service
+
+gRPC is chosen for internal communication between the Location Service and Person Service. This protocol is highly efficient and well-suited for low-latency, high-throughput communication, which is critical for real-time data exchanges. The Location Service needs to communicate frequently with the Person Service to retrieve and update person-related data, and gRPC's support for bidirectional streaming and real-time communication ensures that these interactions are fast and reliable.
+
+3. RESTful API for External Communication 
+
+A RESTful API is used for communication between the User and the API Gateway, allowing external users to interact with the system using standard HTTP methods. REST is ideal for public-facing APIs as it is widely supported, easy to scale, and integrates seamlessly with web and mobile frontends. The API Gateway serves as the entry point for external clients, forwarding requests to appropriate microservices while maintaining security, load balancing, and rate limiting, ensuring the system remains robust and scalable.
+
+4. REST and Kafka for Connection Service (REST API + Kafka Consumer)
+
+The Connection Service is designed to handle both RESTful API interactions and Kafka consumption. It acts as both a producer (publishing events) and a consumer (subscribing to Kafka topics) in order to asynchronously handle location data. This hybrid approach allows the service to receive location events and persist the necessary data in the database via REST, while Kafka enables efficient event processing and decouples the microservices, making the architecture more scalable.
+
+Person Service (REST)
+
+The Person Service is exposed as a RESTful API, allowing external and internal services to query and manipulate person-related data (e.g., name, address, etc.). Using REST for the Person Service ensures that the service is easily accessible, can be scaled independently, and can handle a variety of client requests over HTTP, which is the most common communication pattern for external systems.
+
+

@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+// Define the LocationMessage
+message LocationMessage {
+    int32 person_id = 1;
+    double longitude = 2;
+    double latitude = 3;
+    string creation_time = 4;
+}
+
+// Define a list of LocationMessages
+message LocationMessageList {
+    repeated LocationMessage locations = 1;
+}
+
+// Empty message used in Get RPC
+message Empty {}
+
+// Define the service
+service LocationService {
+    rpc Create(LocationMessage) returns (Empty);
+    rpc Get(Empty) returns (LocationMessageList);  // Correctly referencing LocationMessageList now
+}
+

@@ -1,0 +1,94 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: location-service-grpc
+  name: location-service-grpc
+spec:
+  ports:
+  - name: grpc
+    port: 5005
+    protocol: TCP
+    targetPort: 5005
+    nodePort: 30005  # NodePort for external access
+  selector:
+    app: location-service-grpc
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: location-service-grpc
+  name: location-service-grpc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: location-service-grpc
+  template:
+    metadata:
+      labels:
+        app: location-service-grpc
+    spec:
+      containers:
+      - image: ezachs/location-service-grpc:latest
+        name: location-service-grpc
+        imagePullPolicy: Always
+        env:
+        - name: KAFKA_TOPIC
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-env
+              key: KAFKA_TOPIC  # Kafka topic from ConfigMap
+        - name: KAFKA_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-env
+              key: KAFKA_HOST  # Kafka host from ConfigMap
+        - name: KAFKA_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-env
+              key: KAFKA_PORT  # Kafka port from ConfigMap
+        - name: DB_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: db-env
+              key: DB_USERNAME  # DB username from ConfigMap
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: db-env
+              key: DB_NAME  # DB name from ConfigMap
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: db-env
+              key: DB_HOST  # DB host from ConfigMap
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: db-env
+              key: DB_PORT  # DB port from ConfigMap
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-env
+data:
+  KAFKA_TOPIC: "location_topic"  # Kafka topic for location events
+  KAFKA_HOST: "kafka"        # Kafka host, can be updated based on your setup
+  KAFKA_PORT: "9092"             # Kafka port
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-env
+data:
+  DB_USERNAME: "ct_admin"  # Database username
+  DB_NAME: "geoconnections"  # Database name
+  DB_HOST: "localhost"       # Database host, update if necessary
+  DB_PORT: "5432"            # Database port, default for PostgreSQL

@@ -1,0 +1,93 @@
+gRPC Documentation for Location Service
+Service: LocationService
+
+RPC Method: Create
+
+1. Service Definition
+
+The LocationService service exposes the following method:
+
+---
+Copy
+service LocationService {
+    rpc Create (CreateLocationRequest) returns (CreateLocationResponse);
+}
+---
+
+2. Request Message: CreateLocationRequest
+
+The CreateLocationRequest message contains the following fields:
+
+---
+Field Name	Type	Description
+person_id	int32	The unique identifier of the person.
+longitude	float	The longitude of the person's location.
+latitude	float	The latitude of the person's location.
+creation_time	string	The timestamp indicating when the location was recorded.
+---
+
+3. Response Message: CreateLocationResponse
+
+The CreateLocationResponse message contains the following field:
+
+---
+Field Name	Type	Description
+message	string	A response message indicating the success or failure of the request.
+---
+
+4. Sample Request
+
+To call the Create RPC method, the request should be made with the CreateLocationRequest message. The expected fields are:
+
+---
+person_id: The ID of the person whose location is being saved.
+
+longitude: The longitude of the location.
+
+latitude: The latitude of the location.
+
+creation_time: A timestamp of when the location was recorded.
+---
+
+5. Sample Response
+
+The server will respond with a CreateLocationResponse message containing a message field. A successful creation might return:
+
+---
+Copy
+{
+  "message": "Location created successfully."
+}
+
+---
+
+If there is an error or failure, the response might look like:
+
+---
+Copy
+{
+  "message": "Error: Unable to create location."
+}
+---
+
+6. How to Test?
+
+To test the gRPC API, use the Python client provided in the repository, which contains the logic for calling the Create method and displaying the server's response. The grpc_client.py script demonstrates how to send a request with the required parameters and receive the server's response. Simply ensure that the server is running and execute the Python client script to interact with the gRPC service.
+
+Example commands:
+
+Forward the Port:
+
+Run the following command to forward the gRPC port:
+
+---
+kubectl port-forward svc/location-service-grpc 5006:5005
+---
+
+Execute the Client
+
+Run the Python client to send the request:
+
+---
+python3 grpc_client.py
+---

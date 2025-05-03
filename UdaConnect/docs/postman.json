@@ -1,0 +1,89 @@
+{
+	"info": {
+		"_postman_id": "713608ca-1044-496f-b927-d7313cbeba15",
+		"name": "UdaConnect REST API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14832306",
+		"_collection_link": "https://lively-robot-254204.postman.co/workspace/UdaConnect~982925fe-bd6f-4e5e-8c77-36041bb60baf/collection/14832306-713608ca-1044-496f-b927-d7313cbeba15?action=share&source=collection_link&creator=14832306"
+	},
+	"item": [
+		{
+			"name": "api/persons",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "api/persons/{person_id}",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:30002/api/persons/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "30002",
+					"path": [
+						"api",
+						"persons",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/persons",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:30001/api/persons",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "30001",
+					"path": [
+						"api",
+						"persons"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/locations",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "api/locations/{location_id}",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:30003/api/locations/29",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "30003",
+					"path": [
+						"api",
+						"locations",
+						"29"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
