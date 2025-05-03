@@ -25,26 +25,26 @@
 
 ```
 
-###Location Kafka Consumer Service
+### Location Kafka Consumer Service
 2. Deploy the Location Kafka Consumer Service:
 
 ```bash
 kubectl apply -f deployment/location-consumer.yaml
 ```
-###Person REST API Service
+### Person REST API Service
 3. Deploy the Person REST API service:
 
 ```bash
 kubectl apply -f deployment/person-service-deployment.yaml
 ```
 
-###Person REST API Service
+### Person REST API Service
 3. Deploy the Connection service:
 
 ```bash
 kubectl apply -f deployment/connection-service-deployment.yaml
 ```
-###Kafka and Zookeeper
+### Kafka and Zookeeper
 
 ```bash
 kubectl apply -f deployment/kafka.yaml
