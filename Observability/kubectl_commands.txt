@@ -1,0 +1,14 @@
+kubectl port-forward service/prometheus-grafana --address 0.0.0.0 3000:80 --namespace monitoring
+http://127.0.0.1:3000/
+admin
+prom-operator
+
+kubectl port-forward -n observability svc/jaeger-query 16686:16686 --address 0.0.0.0
+http://127.0.0.1:8088/
+
+kubectl port-forward service/prometheus-kube-prometheus-prometheus --address 0.0.0.0 9090:9090 --namespace monitoring
+http://127.0.0.1:9090/
+
+kubectl port-forward svc/frontend-service 8080:8080 --address 0.0.0.0
+http://127.0.0.1:8080/
+

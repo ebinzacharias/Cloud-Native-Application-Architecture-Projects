@@ -1,0 +1,2 @@
+sudo docker build -t ezachs/observability-backend:latest .
+sudo docker push ezachs/observability-backend:latest
