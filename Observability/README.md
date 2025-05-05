@@ -4,7 +4,7 @@
 
 *TODO:* run `kubectl` command to show the running pods and services for all components. Take a screenshot of the output and include it here to verify the installation
 
-![Alt text](answer-img/1-kubectl-monitoring.png)
+![Alt text](answer-img/1-pods-all-namespaces.png)
 
 ## Setup the Jaeger and Prometheus source
 *TODO:* Expose Grafana to the internet and then setup Prometheus as a data source. Provide a screenshot of the home page after logging into Grafana.
@@ -114,3 +114,13 @@ Description: A 500 Internal Server Error is observed when sending malformed or e
 
 ![Alt text](answer-img/10-final-dashboard.png)
 
+This Grafana dashboard visualizes the three key KPIs that track the application's SLIs and SLO:
+
+1. **Uptime Percentage (Monthly)**  
+   A stat panel that shows the average uptime of the backend service based on the `up` metric. A value of 100 indicates full availability during the measured period.
+
+2. **Request Success Rate (%)**  
+   A gauge panel that displays the percentage of HTTP requests returning 2xx or 3xx status codes. This directly reflects service reliability and user success rates.
+
+3. **P95 Response Time (ms)**  
+   A time-series graph showing the 95th percentile response time, which highlights the latency experience for the majority of users. It helps ensure performance stays within target limits.
