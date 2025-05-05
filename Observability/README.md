@@ -31,8 +31,8 @@
 1. **Uptime Percentage**  - Availability  
    Measures the proportion of time the system is available and operational.It shows the reliability users experience.
 
-2. **Resource Utilization** - Saturation  
-   The degree to which system resources (CPU, memory, I/O) are utilized.
+2. **Request Success Rate**  
+   Measures the percentage of requests that complete successfully — typically those returning HTTP 2xx or 3xx status codes. 
 
 3. **Response Time** - Latency    
    Measures how fast the service responds to user requests. It ensures most requests are answered within the target time.
@@ -62,26 +62,55 @@
 ## Report Error
 *TODO:* Using the template below, write a trouble ticket for the developers, to explain the errors that you are seeing (400, 500, latency) and to let them know the file that is causing the issue also include a screenshot of the tracer span to demonstrate how we can user a tracer to locate errors easily.
 
+![Alt text](answer-img/9-jaeger-span-star-error.png)
+
 TROUBLE TICKET
 
-Name:
+Name: Internal Server Error on /star endpoint
 
-Date:
+Date: 05.05.2025
 
-Subject:
+Subject: 500 Error during POST to /star
 
-Affected Area:
+Affected Area: app.py - Backend Flask API
 
-Severity:
+Severity: High – request failure when storing new star data
 
-Description:
+Description: A 500 Internal Server Error is observed when sending malformed or empty JSON to the /star endpoint. Using Jaeger tracing, the star-span shows the failure along with the tag error=true. This confirms the issue originates from unhandled input parsing logic in the backend.
 
 
 ## Creating SLIs and SLOs
 *TODO:* We want to create an SLO guaranteeing that our application has a 99.95% uptime per month. Name four SLIs that you would use to measure the success of this SLO.
 
+**SLO:**
+
+* Maintain **99.95% uptime** for the backend service per month.
+
+**SLIs:**
+
+1. **Availability** – Service is up and responding to requests.
+2. **Success Rate** – Percentage of HTTP responses with status codes 2xx or 3xx.
+3. **Error Rate** – Percentage of HTTP responses with status codes 5xx.
+4. **Latency** – 95% of requests respond in under 500ms.
+
+
 ## Building KPIs for our plan
 *TODO*: Now that we have our SLIs and SLOs, create a list of 2-3 KPIs to accurately measure these metrics as well as a description of why those KPIs were chosen. We will make a dashboard for this, but first write them down here.
 
+**KPIs**
+
+1. **Uptime Percentage (Monthly)**
+   **Why:** Directly measures our 99.95% uptime SLO. Helps monitor if the service is consistently available throughout the month.
+
+2. **Request Success Rate (%)**
+   **Why:** Tracks the ratio of successful responses (2xx/3xx). A drop indicates user-facing issues and helps catch availability/reliability problems early.
+
+3. **P95 Response Time**
+   **Why:** Measures how fast 95% of the requests are handled. Chosen to ensure latency remains within acceptable limits for most users.
+
+
 ## Final Dashboard
 *TODO*: Create a Dashboard containing graphs that capture all the metrics of your KPIs and adequately representing your SLIs and SLOs. Include a screenshot of the dashboard here, and write a text description of what graphs are represented in the dashboard.  
+
+![Alt text](answer-img/10-final-dashboard.png)
+
