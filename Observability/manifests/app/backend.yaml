@@ -31,7 +31,7 @@ spec:
   selector:
     app: backend
   ports:
-    - name: http           
+    - name: http
       port: 8081
       targetPort: 8080
   type: LoadBalancer
@@ -41,7 +41,7 @@ kind: ServiceMonitor
 metadata:
   name: backend-monitor
   labels:
-    release: prometheus   
+    release: prometheus
 spec:
   selector:
     matchLabels:
